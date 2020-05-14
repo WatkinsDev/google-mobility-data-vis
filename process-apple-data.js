@@ -1,9 +1,6 @@
 parsedAppleMobilityData = function () {
-    var request = new XMLHttpRequest();  
-    request.open("GET", 'http://localhost:8080/applemobilitytrends.csv', false);   
-    request.send(null);  
-    const csv = request.responseText;
-
+    const csv = getCSV();
+    
     const columns = R.pipe(
         R.split('\n'),
         R.head(),
@@ -16,7 +13,7 @@ parsedAppleMobilityData = function () {
     // const transportType = obj => obj["transportation_type"] === 'walking';
     // const transportType = obj => obj["transportation_type"] === 'transit';
 
-    const csvToJson = R.pipe(
+    return csvToJson = R.pipe(
         R.split('\n'),
         R.tail(),
         R.map(R.pipe(
@@ -25,16 +22,16 @@ parsedAppleMobilityData = function () {
         )),
         R.filter(isUk),
         R.filter(transportType),
-        R.map(R.dissoc('geo_type')),
-        R.map(R.dissoc('region')),
-        R.map(R.dissoc('transportation_type')),
-        R.map(R.dissoc('alternative_name'))
+        R.map(R.omit(['geo_type','region','transportation_type','alternative_name'])),
+        element => R.toPairs(element[0]),
+        R.map(element => {return {"Date":element[0], "AnswerCount":element[1]}})
     )(csv)
-    
-    return R.map(
-            element => {return {"Date":element[0], "AnswerCount":element[1]}}
-        )(R.toPairs(csvToJson[0]));
-        
-
 }
+getCSV = function(){
+    var request = new XMLHttpRequest();  
+    request.open("GET", 'http://localhost:8080/applemobilitytrends.csv', false);   
+    request.send(null);  
+    return request.responseText;
+}
+
 parsedAppleMobilityData();
