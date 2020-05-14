@@ -14,28 +14,23 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-color/1.2.1/d3-color.js"></script>
-    <script type="text/javascript" src="http://localhost:8080/process-data.js"></script>
+    <script type="text/javascript" src="http://localhost:8080/process-apple-data.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/ramda/0.25.0/ramda.min.js"></script>
   </head>
   <body>
-    <h4>Daily Number of People in Residential Places in Bristol and Bath</h4>
+    <h4>Daily Percentage of People Driving in the UK (Apple Mobility Data)</h4>
     <svg id="svg"></svg>
     <script>
 
-      console.log("dataRequiredForVis - before")
-      var dataRequiredForVis = parsedGoogleMobilityData();
+      // var dataRequiredForVis = parsedGoogleMobilityData();
+      var dataRequiredForVis = parsedAppleMobilityData();
       
       dataRequiredForVis.sort((a, b) => new Date(a.Date) - new Date(b.Date));
-      console.log("dataRequiredForVis - after")
-      console.log(dataRequiredForVis)
 
       const dateValues = dataRequiredForVis.map(dv => ({
         date: d3.timeDay(new Date(dv.Date)),
         value: Number(dv.AnswerCount)
       }));
-
-      console.log("dateValues")
-      console.log(dateValues)
 
       const svg = d3.select("#svg");
       const { width, height } = document
@@ -49,17 +44,11 @@
           .entries(dateValues)
           .reverse();
 
-        console.log("years")
-        console.log(years)
-
         const values = dateValues.map(c => c.value);
         const maxValue = d3.max(values);
         const minValue = d3.min(values);
 
-        console.log("values")
-        console.log(values)
-        console.log(minValue)
-        console.log(maxValue)
+        console.log({debug:{dataRequiredForVis:dataRequiredForVis, values:values, minValue: minValue, maxValue: maxValue}});
 
         const cellSize = 15;
         const yearHeight = cellSize * 7;
@@ -83,7 +72,7 @@
           .attr("font-size", 16)
           .attr("font-weight", 550)
           .attr("transform", "rotate(270)")
-          .text(d => {console.log(d);return d.key});
+          .text(d => {return d.key});
 
         const formatDay = d =>
           ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"][d.getUTCDay()];
@@ -196,8 +185,6 @@
           .attr("font-size", 14)
           .attr("text-decoration", "underline")
       }
-
-      console.log("drawing")
       draw();
     </script>
   </body>
